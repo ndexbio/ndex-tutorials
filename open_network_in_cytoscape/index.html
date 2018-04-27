@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $.get({
+                url: 'http://localhost:1234/v1',
+                success: function (data) {
+                    console.log(JSON.stringify(data));
+                    $("#cyrest_status").html("<h2>Cytoscape is running</h2>");
+                    cyRest = true;
+                    $.get({
+                        url: 'http://localhost:1234/cyndex2/v1',
+                        success: function (data) {
+
+                            var version = data['data']['appVersion'];
+                            $('#cyndex2_status').html("<h2>CyNDEx2 " + version + "</h2>");
+                            cyNDEx2 = true;
+                        },
+                        error: function (data) {
+                            console.log("error catcher is working: " + data);
+                            $('#cyndex2_status').html("<h2>...but cyNDEx2 is not.</h2>");
+
+                        }
+                    });
+                },
+                error: function () {
+                    $('#cyrest_status').html("<h2>Cytoscape is not running on the local machine</h2>");
+                }
+            });
+            $("#NDExNetworkToCytoscapeButton").click(function () {
+                var postData = JSON.stringify({
+                    uuid: "cac8ec21-2d32-11e8-b939-0ac135e8bacf",
+                    serverUrl: "http://ndexbio.org/v2"
+                });
+                $.post({
+                    url: 'http://localhost:1234/cyndex2/v1/networks',
+                    data: postData,
+                    success: function (data) {
+                        console.log(data);
+                    },
+                    dataType: "application/json",
+                    contentType: "application/json",
+                    crossDomain: true,
+                    error: function (err) {
+                        console.log(err);
+                    }
+
+                });
+            });
+        })
+
+
+
+    </script>
+</head>
+<body>
+
+<div id="cyrest_status"><h2>status</h2></div>
+<div id="cyndex2_status"><h2>status</h2></div>
+
+<button id="NDExNetworkToCytoscapeButton">Network to Cytoscape</button>
+
+</body>
+</html>
